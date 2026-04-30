@@ -1,0 +1,643 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="shell" data-shell-root data-view-mode="dashboard">
+    {% if selected %}
+    <a
+        href="/?campaign_id={{ selected.id }}&view=play"
+        class="view-switch-button dashboard-view-switch"
+        data-view-link
+        aria-label="Переключиться на игровую сцену"
+    >
+        <span class="view-switch-arrow"></span>
+    </a>
+    {% endif %}
+    <aside class="sidebar">
+        <section class="card brand-card compact-brand">
+            <p class="eyebrow">LM Studio + Google API</p>
+            <h1>RPG Memory DM</h1>
+            <p class="muted">База мира, сцены и канон кампании в одном окне.</p>
+        </section>
+
+        <details class="card fold-card api-key-card">
+            <summary class="fold-summary">
+                <div>
+                    <p class="eyebrow">Demo keys</p>
+                    <h2>API-ключи</h2>
+                </div>
+                <span class="fold-summary-icon"></span>
+            </summary>
+            <div class="fold-body">
+                <form class="stack-form api-key-form" data-api-key-form>
+                    <label>
+                        <span>Google API key для текста</span>
+                        <input name="text_api_key" type="password" autocomplete="off" data-text-api-key-input placeholder="AIz...">
+                        <small class="muted">Рекомендовано: Gemma 4 или Gemini 3.1 Pro.</small>
+                    </label>
+                    <label>
+                        <span>Google API key для голоса</span>
+                        <input name="voice_api_key" type="password" autocomplete="off" data-voice-api-key-input placeholder="AIz...">
+                        <small class="muted">Рекомендовано: Gemini Flash TTS, пресет Leda уже настроен.</small>
+                    </label>
+                    <div class="api-key-actions">
+                        <button class="secondary-button small-button" type="submit">Сохранить</button>
+                        <button class="note-delete-button small-button" type="button" data-clear-api-keys>Очистить</button>
+                    </div>
+                    <p class="status-line muted" data-api-key-status></p>
+                </form>
+            </div>
+        </details>
+
+        <details class="card fold-card compact-section" open>
+            <summary class="fold-summary">
+                <div>
+                    <p class="eyebrow">Workspace</p>
+                    <h2>Кампании</h2>
+                </div>
+                <span class="badge">{{ campaigns|length }}</span>
+            </summary>
+            <div class="fold-body">
+                <div class="campaign-list">
+                    {% for campaign in campaigns %}
+                    <article class="campaign-tile {% if selected and selected.id == campaign.id %}is-active is-open{% endif %}" data-campaign-card>
+                        <div class="campaign-tile-head">
+                            <a href="/?campaign_id={{ campaign.id }}" class="campaign-link" data-campaign-link>
+                                <strong>{{ campaign.title }}</strong>
+                                <span>{{ campaign.hero.name if campaign.hero else "Без героя" }}</span>
+                                <span class="muted">{{ campaign.model_id }}</span>
+                            </a>
+                            <div class="campaign-actions">
+                                <button
+                                    class="icon-button"
+                                    type="button"
+                                    data-campaign-toggle
+                                    aria-label="Показать детали кампании"
+                                    aria-expanded="{% if selected and selected.id == campaign.id %}true{% else %}false{% endif %}"
+                                >
+                                    <span class="chevron-mark"></span>
+                                </button>
+                                <button
+                                    class="icon-button danger"
+                                    type="button"
+                                    data-delete-campaign-id="{{ campaign.id }}"
+                                    data-delete-campaign-title="{{ campaign.title }}"
+                                    aria-label="Удалить кампанию"
+                                >
+                                    <span class="trash-icon" aria-hidden="true">
+                                        <span class="trash-lid"></span>
+                                        <span class="trash-body"></span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="campaign-extra {% if selected and selected.id == campaign.id %}is-open{% endif %}">
+                            <p class="muted campaign-goal">{{ campaign.goal }}</p>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </details>
+
+        {% if selected %}
+        <details class="card fold-card hero-card" open>
+            <summary class="fold-summary">
+                <div>
+                    <p class="eyebrow">Hero Sheet</p>
+                    <h2>Лист героя</h2>
+                </div>
+                <span class="badge accent">{{ selected.hero.current_location or "Локация не указана" }}</span>
+            </summary>
+            <div class="fold-body">
+                <div class="hero-summary">
+                    <h3>{{ selected.hero.name }}</h3>
+                    <p class="muted">{{ selected.hero.archetype }}</p>
+                    <p>{{ selected.hero.description }}</p>
+                    {% if selected.hero.status_text %}
+                    <p class="status-chip">{{ selected.hero.status_text }}</p>
+                    {% endif %}
+                </div>
+                <div class="stat-list">
+                    <div class="stat-pill"><span>Сила</span><strong>{{ selected.hero.stats.get("brute_force", 0) }}</strong></div>
+                    <div class="stat-pill"><span>Бюрократия</span><strong>{{ selected.hero.stats.get("bureaucracy", 0) }}</strong></div>
+                    <div class="stat-pill"><span>Софт-скиллы</span><strong>{{ selected.hero.stats.get("soft_skills", 0) }}</strong></div>
+                    <div class="stat-pill"><span>Уклонение</span><strong>{{ selected.hero.stats.get("evasion", 0) }}</strong></div>
+                    <div class="stat-pill hp-pill"><span>HP</span><strong>{{ selected.hero.stats.get("hp", 20) }}/{{ selected.hero.stats.get("max_hp", 20) }}</strong></div>
+                    <div class="stat-pill"><span>Стресс</span><strong>{{ selected.hero.stats.get("stress", 0) }}/{{ selected.hero.stats.get("max_stress", 7) }}</strong></div>
+                    <div class="stat-pill"><span>Металлолом</span><strong>{{ selected.hero.stats.get("scrap", 0) }}</strong></div>
+                </div>
+                <div class="inventory-block">
+                    <h4>Инвентарь</h4>
+                    {% if selected.hero.inventory %}
+                    <ul>
+                        {% for item in selected.hero.inventory %}
+                        <li>{{ item.name }} x{{ item.quantity }}{% if item.description %} — {{ item.description }}{% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="muted">Пока пусто.</p>
+                    {% endif %}
+                </div>
+
+                <details class="mini-fold hero-editor" open>
+                    <summary class="mini-fold-summary">
+                        <span>Редактировать вручную</span>
+                        <span class="mini-fold-icon"></span>
+                    </summary>
+                    <form id="hero-form" class="stack-form" data-campaign-id="{{ selected.id }}">
+                        <div class="split two">
+                            <label>
+                                <span>Имя</span>
+                                <input name="name" value="{{ selected.hero.name }}" required>
+                            </label>
+                            <label>
+                                <span>Архетип</span>
+                                <input name="archetype" value="{{ selected.hero.archetype }}" required>
+                            </label>
+                        </div>
+                        <label>
+                            <span>Описание</span>
+                            <textarea name="description" rows="3" required>{{ selected.hero.description }}</textarea>
+                        </label>
+                        <div class="split two">
+                            <label>
+                                <span>Статус</span>
+                                <input name="status_text" value="{{ selected.hero.status_text or '' }}">
+                            </label>
+                            <label>
+                                <span>Текущая локация</span>
+                                <input name="current_location_name" value="{{ selected.hero.current_location or '' }}">
+                            </label>
+                        </div>
+                        <div class="split stats-grid">
+                            <label><span>Сила</span><input name="brute_force" type="number" value="{{ selected.hero.stats.get('brute_force', 0) }}"></label>
+                            <label><span>Бюрократия</span><input name="bureaucracy" type="number" value="{{ selected.hero.stats.get('bureaucracy', 0) }}"></label>
+                            <label><span>Софт-скиллы</span><input name="soft_skills" type="number" value="{{ selected.hero.stats.get('soft_skills', 0) }}"></label>
+                            <label><span>Уклонение</span><input name="evasion" type="number" value="{{ selected.hero.stats.get('evasion', 0) }}"></label>
+                            <label><span>HP</span><input name="hp" type="number" value="{{ selected.hero.stats.get('hp', 20) }}"></label>
+                            <label><span>Макс HP</span><input name="max_hp" type="number" value="{{ selected.hero.stats.get('max_hp', 20) }}"></label>
+                            <label><span>Стресс</span><input name="stress" type="number" value="{{ selected.hero.stats.get('stress', 0) }}"></label>
+                            <label><span>Лимит</span><input name="max_stress" type="number" value="{{ selected.hero.stats.get('max_stress', 7) }}"></label>
+                            <label><span>Металлолом</span><input name="scrap" type="number" value="{{ selected.hero.stats.get('scrap', 0) }}"></label>
+                        </div>
+                        <label>
+                            <span>Инвентарь</span>
+                            <textarea name="inventory_text" rows="4">{% for item in selected.hero.inventory %}{{ item.name }} x{{ item.quantity }}{% if item.description %} ({{ item.description }}){% endif %}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                        </label>
+                        <button class="secondary-button" type="submit">Сохранить лист героя</button>
+                        <p id="hero-status" class="status-line muted"></p>
+                    </form>
+                </details>
+            </div>
+        </details>
+        {% endif %}
+
+        <details class="card fold-card tool-card" open>
+            <summary class="fold-summary">
+                <div>
+                    <p class="eyebrow">Toolkit</p>
+                    <h2>Создание и импорт</h2>
+                </div>
+                <span class="fold-summary-icon"></span>
+            </summary>
+            <div class="fold-body">
+            <details class="mini-fold" open>
+                <summary class="mini-fold-summary">
+                    <span>Новая кампания</span>
+                    <span class="mini-fold-icon"></span>
+                </summary>
+                <form id="campaign-form" class="stack-form">
+                    <label>
+                        <span>Название</span>
+                        <input name="title" value="Кофейный кризис на 23 этаже" required>
+                    </label>
+                    <label>
+                        <span>Сеттинг</span>
+                        <input name="setting_name" value="Корпоративное фэнтези" required>
+                    </label>
+                    <label>
+                        <span>Главная цель</span>
+                        <textarea name="goal" rows="3" required>Спуститься на -145 этаж и получить подпись HR-Лича на установку новой кофемашины.</textarea>
+                    </label>
+                    <label>
+                        <span>Тон</span>
+                        <input name="tone" value="Жесткое, смешное и опасное офисное фэнтези">
+                    </label>
+                    <label>
+                        <span>Модель</span>
+                        <select name="model_id">
+                            {% for model_id in available_models %}
+                            <option value="{{ model_id }}" {% if model_id == default_model %}selected{% endif %}>{{ model_id }}</option>
+                            {% endfor %}
+                            {% if not available_models %}
+                            <option value="{{ default_model }}">{{ default_model }}</option>
+                            {% endif %}
+                        </select>
+                    </label>
+                    <details class="mini-fold prompt-guard-fold">
+                        <summary class="mini-fold-summary">
+                            <span>Защищённые правила DM</span>
+                            <span class="mini-fold-icon"></span>
+                        </summary>
+                        <label class="readonly-field">
+                            <span>Этот блок всегда добавляется системой и не зависит от редактируемого сюжета.</span>
+                            <textarea rows="10" readonly>{{ protected_rules_prompt }}</textarea>
+                        </label>
+                    </details>
+                    <label>
+                        <span>Сюжет и геймплей кампании</span>
+                        <textarea name="system_prompt" rows="7" data-prompt-template-textarea required>{{ selected.system_prompt if selected else "" }}</textarea>
+                    </label>
+                    <div class="template-tools compact-template-tools" data-prompt-template-tools>
+                        <select data-prompt-template-select aria-label="Шаблоны описаний">
+                            <option value="">Шаблоны описаний</option>
+                        </select>
+                        <input data-prompt-template-name placeholder="Название">
+                        <button class="secondary-button small-button" type="button" data-load-prompt-template>Загрузить</button>
+                        <button class="secondary-button small-button" type="button" data-save-prompt-template>Сохранить</button>
+                        <button class="note-delete-button small-button" type="button" data-delete-prompt-template>Удалить</button>
+                    </div>
+                    <div class="split two">
+                        <label>
+                            <span>Имя героя</span>
+                            <input name="hero_name" value="Хитрый кобольд-инженер" required>
+                        </label>
+                        <label>
+                            <span>Архетип</span>
+                            <input name="hero_archetype" value="Младший специалист-инженер" required>
+                        </label>
+                    </div>
+                    <label>
+                        <span>Описание героя</span>
+                        <textarea name="hero_description" rows="3" required>Маленький кобольд, который выживает хитростью, мастерит гаджеты из металлолома и мечтает наконец стать героем.</textarea>
+                    </label>
+                    <div class="split stats-grid">
+                        <label><span>Сила</span><input name="brute_force" type="number" value="-1"></label>
+                        <label><span>Бюрократия</span><input name="bureaucracy" type="number" value="3"></label>
+                        <label><span>Софт-скиллы</span><input name="soft_skills" type="number" value="1"></label>
+                        <label><span>Уклонение</span><input name="evasion" type="number" value="2"></label>
+                        <label><span>HP</span><input name="hp" type="number" value="20"></label>
+                        <label><span>Макс HP</span><input name="max_hp" type="number" value="20"></label>
+                        <label><span>Стресс</span><input name="stress" type="number" value="0"></label>
+                        <label><span>Лимит</span><input name="max_stress" type="number" value="7"></label>
+                        <label><span>Металлолом</span><input name="scrap" type="number" value="3"></label>
+                    </div>
+                    <label>
+                        <span>Инвентарь</span>
+                        <textarea name="hero_inventory_text" rows="3">Заявление на кофемашину x1
+Металлолом x3</textarea>
+                    </label>
+                    <button class="primary-button" type="submit">Создать кампанию</button>
+                </form>
+            </details>
+
+            <details class="mini-fold">
+                <summary class="mini-fold-summary">
+                    <span>Импорт старой партии</span>
+                    <span class="mini-fold-icon"></span>
+                </summary>
+                {% if selected %}
+                <form id="import-form" class="stack-form" data-campaign-id="{{ selected.id }}">
+                    <label>
+                        <span>Лог или краткое описание</span>
+                        <textarea name="transcript" rows="7" placeholder="Сюда можно вставить старый лог из LM Studio или краткое резюме уже сыгранных сцен." required></textarea>
+                    </label>
+                    <p class="muted import-note-hint">Импорт обновит базу мира и отдельный рекап кампании. В заметки сырой лог не попадёт.</p>
+                    <button class="secondary-button" type="submit">Импортировать</button>
+                    <p id="import-status" class="status-line muted"></p>
+                </form>
+                {% else %}
+                <p class="muted">Сначала создай кампанию, затем сюда можно будет импортировать старый лог.</p>
+                {% endif %}
+            </details>
+            </div>
+        </details>
+
+        <details class="card fold-card">
+            <summary class="fold-summary">
+                <div>
+                    <p class="eyebrow">Live Settings</p>
+                    <h2>Настройки кампании</h2>
+                </div>
+                <span class="fold-summary-icon"></span>
+            </summary>
+            <div class="fold-body">
+            {% if selected %}
+            <form id="campaign-settings-form" class="stack-form" data-campaign-id="{{ selected.id }}">
+                <label>
+                    <span>Название</span>
+                    <input name="title" value="{{ selected.title }}" required>
+                </label>
+                <label>
+                    <span>Сеттинг</span>
+                    <input name="setting_name" value="{{ selected.setting_name }}" required>
+                </label>
+                <label>
+                    <span>Тон</span>
+                    <input name="tone" value="{{ selected.tone }}">
+                </label>
+                <label>
+                    <span>Модель</span>
+                    <select name="model_id">
+                        {% if selected.model_id and selected.model_id not in available_models %}
+                        <option value="{{ selected.model_id }}" selected>{{ selected.model_id }}</option>
+                        {% endif %}
+                        {% for model_id in available_models %}
+                        <option value="{{ model_id }}" {% if model_id == selected.model_id %}selected{% endif %}>{{ model_id }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <details class="mini-fold prompt-guard-fold">
+                    <summary class="mini-fold-summary">
+                        <span>Защищённые правила DM</span>
+                        <span class="mini-fold-icon"></span>
+                    </summary>
+                    <label class="readonly-field">
+                        <span>Этот блок всегда добавляется системой и не стирается при тестах сюжета.</span>
+                        <textarea rows="10" readonly>{{ protected_rules_prompt }}</textarea>
+                    </label>
+                </details>
+                <label>
+                    <span>Главная цель</span>
+                    <textarea name="goal" rows="3" required>{{ selected.goal }}</textarea>
+                </label>
+                <label>
+                    <span>Сюжет и геймплей кампании</span>
+                    <textarea name="system_prompt" rows="7" data-prompt-template-textarea required>{{ selected.system_prompt }}</textarea>
+                </label>
+                <div class="template-tools compact-template-tools" data-prompt-template-tools>
+                    <select data-prompt-template-select aria-label="Шаблоны описаний">
+                        <option value="">Шаблоны описаний</option>
+                    </select>
+                    <input data-prompt-template-name placeholder="Название">
+                    <button class="secondary-button small-button" type="button" data-load-prompt-template>Загрузить</button>
+                    <button class="secondary-button small-button" type="button" data-save-prompt-template>Сохранить</button>
+                    <button class="note-delete-button small-button" type="button" data-delete-prompt-template>Удалить</button>
+                </div>
+                <button class="secondary-button" type="submit">Сохранить настройки</button>
+                <p id="campaign-settings-status" class="status-line muted"></p>
+            </form>
+            {% else %}
+            <p class="muted">Настройки появятся после создания кампании.</p>
+            {% endif %}
+            </div>
+        </details>
+    </aside>
+
+    <main class="main-column">
+        {% if selected %}
+        {% set memory_status = selected.memory_updates[0] if selected.memory_updates else None %}
+        {% if memory_status and memory_status.status == "failed" %}
+        <div class="alert-banner">
+            Память последнего хода не обновилась автоматически.
+            {% if memory_status.error_message %}
+            <details class="error-details">
+                <summary>Показать причину</summary>
+                <pre>{{ memory_status.error_message }}</pre>
+            </details>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="dashboard-grid">
+            <section class="chat-column card chat-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Сцена</p>
+                        <h2>{{ selected.title }}</h2>
+                    </div>
+                    <div class="header-badges">
+                        <span class="badge subtle">{{ selected.model_id }}</span>
+                        <span class="badge accent">{{ selected.turns|length }} ходов</span>
+                    </div>
+                </div>
+
+                <div class="chat-stage">
+                    <div id="chat-log" class="chat-log messenger-log">
+                        {% if selected.turns %}
+                            {% for turn in selected.turns %}
+                            <article class="message-row {{ turn.role }}">
+                                <div class="message-avatar {{ turn.role }}">
+                                    <span>{% if turn.role == "assistant" %}DM{% else %}TY{% endif %}</span>
+                                </div>
+                                <div class="message-bubble {{ turn.role }}">
+                                    <div class="message-meta">
+                                        <strong>{{ "DM" if turn.role == "assistant" else "Игрок" }}</strong>
+                                        {% if turn.dice_result %}
+                                        <span class="badge subtle">d20: {{ turn.dice_result }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-body">{{ turn.content }}</div>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-scene">
+                                <p class="eyebrow">Сцена пуста</p>
+                                <h3>Первый ход еще не сделан</h3>
+                                <p class="muted">Подставь стартовый ход или начни сцену своим действием.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <form id="turn-form" class="stack-form chat-form" data-campaign-id="{{ selected.id }}">
+                        <label class="message-field">
+                            <span>Действие игрока</span>
+                            <textarea name="message" rows="6" placeholder="Например: я осматриваю коридор, ищу обходной путь к архивному лифту." required></textarea>
+                        </label>
+                        <div class="chat-controls">
+                            <label class="dice-field">
+                                <span>Результат броска d20</span>
+                                <input name="dice_result" type="number" min="1" max="20" placeholder="если DM запросил">
+                            </label>
+                            <div class="chat-actions">
+                                {% if not selected.turns %}
+                                <button id="prefill-start-button" class="secondary-button" type="button">Стартовый ход</button>
+                                {% endif %}
+                                <button class="primary-button" type="submit">Отправить ход</button>
+                            </div>
+                        </div>
+                        <p id="turn-status" class="status-line muted"></p>
+                    </form>
+                </div>
+            </section>
+
+            <section class="info-column">
+
+                <details class="card fold-card" open>
+                    <summary class="fold-summary">
+                        <div>
+                            <p class="eyebrow">Quests</p>
+                            <h2>Квесты</h2>
+                        </div>
+                        <span class="badge">{{ selected.quests|length }}</span>
+                    </summary>
+                    <div class="fold-body">
+                    <div class="mini-list">
+                        {% for quest in selected.quests %}
+                        <article class="mini-card quest-card">
+                            <div class="section-heading inline quest-head">
+                                <h3>{{ quest.title }}</h3>
+                                <div class="header-badges">
+                                    <span class="badge subtle">{{ quest.kind }}</span>
+                                    {% if quest.turns_remaining is not none %}
+                                    <span class="badge {% if quest.status == 'active' %}accent{% else %}subtle{% endif %}">{{ quest.turns_remaining }}/{{ quest.turns_total }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="muted">{{ quest.status }}</p>
+                            <p>{{ quest.description }}</p>
+                            {% if quest.progress_note %}
+                            <p class="muted">{{ quest.progress_note }}</p>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </details>
+
+                <details class="card fold-card" open>
+                    <summary class="fold-summary">
+                        <div>
+                            <p class="eyebrow">World</p>
+                            <h2>Локации</h2>
+                        </div>
+                        <span class="badge">{{ selected.locations|length }}</span>
+                    </summary>
+                    <div class="fold-body">
+                    <div class="location-groups">
+                        {% for group in selected.location_groups %}
+                        <details class="mini-fold location-group-fold" open>
+                            <summary class="mini-fold-summary">
+                                <span>{{ group.name }}</span>
+                                <span class="badge subtle">{{ group.locations|length }}</span>
+                            </summary>
+                            <div class="mini-list">
+                                {% for location in group.locations %}
+                                <details class="mini-fold location-entry-fold">
+                                    <summary class="mini-fold-summary">
+                                        <span>{{ location.name }}</span>
+                                        <span class="badge subtle">{{ location.danger_level }}</span>
+                                    </summary>
+                                    <article class="mini-card location-card">
+                                        <p>{{ location.summary }}</p>
+                                        {% if location.details %}
+                                        <p class="muted">{{ location.details }}</p>
+                                        {% endif %}
+                                        {% if location.notable_features %}
+                                        <p><strong>Приметы:</strong> {{ location.notable_features | join(", ") }}</p>
+                                        {% endif %}
+                                        {% if location.exits %}
+                                        <p><strong>Выходы:</strong> {{ location.exits | join(", ") }}</p>
+                                        {% endif %}
+                                    </article>
+                                </details>
+                                {% endfor %}
+                            </div>
+                        </details>
+                        {% else %}
+                        <p class="muted">Локации появятся, когда DM их опишет и память мира сохранит их в базу.</p>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </details>
+
+                <details class="card fold-card" open>
+                    <summary class="fold-summary">
+                        <div>
+                            <p class="eyebrow">Cast</p>
+                            <h2>Персонажи</h2>
+                        </div>
+                        <span class="badge">{{ selected.characters|length }}</span>
+                    </summary>
+                    <div class="fold-body">
+                    <div class="mini-list">
+                        {% for character in selected.characters %}
+                        <details class="mini-fold character-fold">
+                            <summary class="mini-fold-summary">
+                                <span>{{ character.name }}</span>
+                                <span class="badge subtle">{{ character.role }}{% if character.location %} · {{ character.location }}{% endif %}</span>
+                            </summary>
+                            <article class="mini-card">
+                                <p>{{ character.summary }}</p>
+                                {% if character.personality %}
+                                <p class="muted">Характер: {{ character.personality }}</p>
+                                {% endif %}
+                                {% if character.status %}
+                                <p class="muted">Статус: {{ character.status }}</p>
+                                {% endif %}
+                            </article>
+                        </details>
+                        {% else %}
+                        <p class="muted">NPC и враги появятся здесь, когда память кампании их зафиксирует.</p>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </details>
+
+                <details class="card fold-card" open>
+                    <summary class="fold-summary">
+                        <div>
+                            <p class="eyebrow">GM Notes</p>
+                            <h2>Заметки</h2>
+                        </div>
+                        <span class="badge">{{ selected.notes|length }}</span>
+                    </summary>
+                    <div class="mini-list notes-list">
+                        {% for note in selected.notes %}
+                        <article class="mini-card">
+                            <div class="section-heading inline">
+                                <h3>{{ note.title }}</h3>
+                                <span class="badge subtle">{{ note.category }}</span>
+                            </div>
+                            <p>{{ note.body }}</p>
+                            <div class="note-actions">
+                                <button
+                                    class="note-delete-button"
+                                    type="button"
+                                    data-campaign-id="{{ selected.id }}"
+                                    data-delete-note-id="{{ note.id }}"
+                                >
+                                    Удалить
+                                </button>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    <form id="note-form" class="stack-form" data-campaign-id="{{ selected.id }}">
+                        <label>
+                            <span>Новая заметка</span>
+                            <input name="title" placeholder="Например: правка канона" required>
+                        </label>
+                        <label>
+                            <span>Текст</span>
+                            <textarea name="body" rows="3" placeholder="Используй для ручной коррекции памяти." required></textarea>
+                        </label>
+                        <div class="split two align-end">
+                            <label>
+                                <span>Категория</span>
+                                <select name="category">
+                                    <option value="manual">manual</option>
+                                    <option value="canon">canon</option>
+                                    <option value="gm_note">gm_note</option>
+                                    <option value="warning">warning</option>
+                                    <option value="quest">quest</option>
+                                </select>
+                            </label>
+                            <button class="secondary-button" type="submit">Добавить заметку</button>
+                        </div>
+                        <p id="note-status" class="status-line muted"></p>
+                    </form>
+                </details>
+            </section>
+        </div>
+        {% else %}
+        <section class="card">
+            <p class="eyebrow">Пусто</p>
+            <h2>Кампаний пока нет</h2>
+            <p class="muted">Создай новую кампанию слева в разделе “Создание и импорт”.</p>
+        </section>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

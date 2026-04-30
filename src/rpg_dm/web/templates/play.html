@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="play-shell" data-shell-root data-view-mode="play" {% if selected %}data-campaign-id="{{ selected.id }}"{% endif %}>
+    {% if selected %}
+    {% set current_scene_name = selected.current_location_details.name if selected.current_location_details else selected.hero.current_location %}
+    <div class="play-stage-wrap" data-fixed-stage-wrap>
+        <div class="play-stage" data-fixed-stage>
+            <div class="play-art-layer play-background-layer" aria-hidden="true">
+                <img class="play-art-image" src="{{ url_for('static', path='scene/background.png') }}" alt="">
+            </div>
+
+            <div class="play-art-layer play-character-layer" aria-hidden="true">
+                <div class="character-sprite" data-gemma-sprite>
+                    <img class="character-sprite-frame is-active" data-emotion-frame="neutral" src="{{ url_for('static', path='scene/gemma-neutral.png') }}" alt="">
+        <img class="character-sprite-frame" data-emotion-frame="joy" src="{{ url_for('static', path='scene/gemma-joy.png') }}?v=2" alt="">
+                    <img class="character-sprite-frame" data-emotion-frame="surprised" src="{{ url_for('static', path='scene/gemma-surprised.png') }}" alt="">
+                    <img class="character-sprite-frame" data-emotion-frame="angry" src="{{ url_for('static', path='scene/gemma-sulking.png') }}" alt="">
+                    <img class="character-sprite-frame" data-emotion-frame="fear" src="{{ url_for('static', path='scene/gemma-fright.png') }}" alt="">
+                    <img class="character-sprite-frame" data-emotion-frame="shock" src="{{ url_for('static', path='scene/gemma-shocked.png') }}" alt="">
+                    <img class="character-sprite-frame" data-emotion-frame="glasses" src="{{ url_for('static', path='scene/gemma-glasses.png') }}" alt="">
+                </div>
+            </div>
+
+            <div class="play-art-layer play-prop-layer" aria-hidden="true">
+                <img class="play-art-image" src="{{ url_for('static', path='scene/desk-screen.png') }}" alt="">
+            </div>
+
+            <div class="play-ui-layer">
+                <a href="/?campaign_id={{ selected.id }}" class="play-back-button" data-view-link aria-label="Вернуться к панели управления">
+                    <span class="view-switch-arrow left"></span>
+                </a>
+
+                <aside class="play-side-nav" aria-label="Разделы сцены">
+                    <div class="play-side-top">
+                        <div class="play-dm-avatar" aria-hidden="true">
+                            <span>GM</span>
+                        </div>
+                        <div class="play-dm-meta">
+                            <strong>DM</strong>
+                            <span>Gemma</span>
+                        </div>
+                    </div>
+
+                    <div class="play-nav-stack">
+                        <button class="play-nav-button is-active" type="button" data-scene-panel-button="scene" aria-label="Сцена">
+                            <span class="play-nav-icon play-nav-icon--scene" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M12 21s6-5.15 6-11a6 6 0 1 0-12 0c0 5.85 6 11 6 11Zm0-8.25A2.75 2.75 0 1 1 12 7.25a2.75 2.75 0 0 1 0 5.5Z"/></svg>
+                            </span>
+                            <span class="play-nav-text">Сцена</span>
+                        </button>
+                        <button class="play-nav-button" type="button" data-scene-panel-button="characters" aria-label="Персонажи">
+                            <span class="play-nav-icon play-nav-icon--characters" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 9v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1h-2v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v1Z"/></svg>
+                            </span>
+                            <span class="play-nav-text">Персонажи</span>
+                        </button>
+                        <button class="play-nav-button" type="button" data-scene-panel-button="quests" aria-label="Квесты">
+                            <span class="play-nav-icon play-nav-icon--quests" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M7 4a2 2 0 0 0-2 2v14l7-3 7 3V6a2 2 0 0 0-2-2Zm0 2h10v10.97l-5-2.15-5 2.15Z"/></svg>
+                            </span>
+                            <span class="play-nav-text">Квесты</span>
+                        </button>
+                        <button class="play-nav-button" type="button" data-scene-panel-button="inventory" aria-label="Инвентарь">
+                            <span class="play-nav-icon play-nav-icon--inventory" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M8 7V6a4 4 0 0 1 8 0v1h2a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a2 2 0 0 1 2-2Zm2 0h4V6a2 2 0 0 0-4 0Zm-4 2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9Z"/></svg>
+                            </span>
+                            <span class="play-nav-text">Инвентарь</span>
+                        </button>
+                    </div>
+
+                    <div class="play-side-bottom">
+                        <div class="play-side-status">
+                            <span class="play-side-time" data-scene-clock>21:45</span>
+                            <span class="play-side-online"><span class="play-online-dot"></span>Сеть</span>
+                        </div>
+                        <div class="play-side-crystal" aria-hidden="true"></div>
+                    </div>
+                </aside>
+
+                <section class="play-gemma-dialog" aria-label="Диалог Gemma">
+                    <div class="play-gemma-head">
+                        <div class="play-gemma-head-main">
+                            <div class="play-gemma-face" aria-hidden="true">GM</div>
+                            <div class="play-gemma-head-copy">
+                                <p class="eyebrow">DM CONSOLE</p>
+                                <h2>ГЕММА</h2>
+                            </div>
+                        </div>
+                        <div class="play-gemma-status-stack">
+                            <span class="play-dialog-status">{{ selected.model_id or "gemma" }}</span>
+                            <span class="play-dialog-emotion" data-scene-emotion-label>Авто</span>
+                        </div>
+                    </div>
+
+                    <div class="play-gemma-body">
+                        <div class="message-bubble assistant play-dialog-bubble">
+                            <div class="message-body">
+                                {% if selected.latest_assistant_turn %}
+                                {{ selected.latest_assistant_turn.content }}
+                                {% else %}
+                                EMOTION:neutral|[Тихо поправляю очки и сверяюсь с заметками.]
+                                DM:Сцена ждёт первого хода. Когда будешь готов, я открою игру с нужного момента.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="play-gemma-footer" type="button" data-scene-panel-button="scene">История</button>
+                </section>
+
+                <button class="play-voice-toggle is-disabled" type="button" data-voice-toggle aria-pressed="false" aria-label="Голос Gemma">
+                    <span class="play-voice-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-4a3.5 3.5 0 1 0-7 0v4A3.5 3.5 0 0 0 12 15Zm6-3.5a1 1 0 0 0-2 0 4 4 0 0 1-8 0 1 1 0 0 0-2 0 6 6 0 0 0 5 5.91V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.59A6 6 0 0 0 18 11.5Z"/></svg>
+                    </span>
+                    <span class="play-voice-copy">
+                        <span class="play-voice-title">ГОЛОС</span>
+                        <span class="play-voice-state"><span data-voice-state-text>ВЫКЛ</span> <span class="play-online-dot"></span></span>
+                        <span class="play-voice-status" data-voice-status>Авточтение выключено</span>
+                    </span>
+                </button>
+                <select class="play-voice-provider" data-voice-provider aria-label="TTS provider">
+                    <option value="google">Google 3.1 Leda</option>
+                    <option value="google25">Google 2.5 Leda</option>
+                    <option value="silero">Silero local</option>
+                    <option value="edge">Edge</option>
+                </select>
+                <details class="play-api-key-panel">
+                    <summary>API</summary>
+                    <form class="api-key-form" data-api-key-form>
+                        <label>
+                            <span>Текст</span>
+                            <input name="text_api_key" type="password" autocomplete="off" data-text-api-key-input placeholder="Gemma 4 / Gemini 3.1 Pro">
+                        </label>
+                        <label>
+                            <span>Голос</span>
+                            <input name="voice_api_key" type="password" autocomplete="off" data-voice-api-key-input placeholder="Flash TTS Leda">
+                        </label>
+                        <div class="api-key-actions">
+                            <button type="submit">OK</button>
+                            <button type="button" data-clear-api-keys>×</button>
+                        </div>
+                        <p data-api-key-status></p>
+                    </form>
+                </details>
+                <button class="play-voice-replay" type="button" data-voice-replay aria-label="Проиграть последний ответ Gemma">
+                    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.67-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14Z"/></svg>
+                </button>
+
+                <aside class="play-info-panel is-open" data-scene-drawer>
+                    <div class="play-info-head">
+                        <div class="play-info-head-main">
+                            <p class="eyebrow" data-scene-drawer-eyebrow>SCENE</p>
+                            <h2 class="play-info-title-row">
+                                <span class="play-panel-icon play-panel-icon--scene" data-scene-drawer-icon aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" focusable="false"><path d="M12 21s6-5.15 6-11a6 6 0 1 0-12 0c0 5.85 6 11 6 11Zm0-8.25A2.75 2.75 0 1 1 12 7.25a2.75 2.75 0 0 1 0 5.5Z"/></svg>
+                                </span>
+                                <span data-scene-drawer-title>Сцена</span>
+                            </h2>
+                        </div>
+                        <button class="play-info-close" type="button" data-scene-drawer-close aria-label="Закрыть окно">×</button>
+                    </div>
+
+                    <div class="play-info-panels">
+                        <section class="play-info-section is-active" data-scene-panel="scene">
+                            <div class="play-info-scroll">
+                                <article class="play-glass-card">
+                                    <h3>{{ current_scene_name or "Сцена ещё не указана" }}</h3>
+                                    <p>{{ selected.current_location_details.summary if selected.current_location_details else "Gemma пока не зафиксировала текущую сцену в памяти мира." }}</p>
+                                    {% if selected.current_location_details and selected.current_location_details.details %}
+                                    <button class="play-scene-details-toggle" type="button" data-scene-details-toggle aria-expanded="false">Подробнее</button>
+                                    <div class="play-scene-details" data-scene-details hidden>
+                                        <p class="muted">{{ selected.current_location_details.details }}</p>
+                                    </div>
+                                    {% endif %}
+                                </article>
+
+                                {% if selected.latest_user_turn %}
+                                <article class="play-glass-card">
+                                    <h3>Последний ход героя</h3>
+                                    <p>{{ selected.latest_user_turn.content }}</p>
+                                </article>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="play-info-section" data-scene-panel="characters">
+                            <div class="play-info-scroll">
+                                <article class="play-glass-card">
+                                    <div class="play-card-head">
+                                        <h3>{{ selected.hero.name }}</h3>
+                                        <span class="play-pill">hero</span>
+                                    </div>
+                                    <p>{{ selected.hero.description }}</p>
+                                    {% if current_scene_name %}
+                                    <p class="muted">Где: {{ current_scene_name }}</p>
+                                    {% endif %}
+                                </article>
+
+                                {% set ns = namespace(count=0) %}
+                                {% for character in selected.characters %}
+                                {% if current_scene_name and character.location == current_scene_name %}
+                                {% set ns.count = ns.count + 1 %}
+                                <article class="play-glass-card">
+                                    <div class="play-card-head">
+                                        <h3>{{ character.name }}</h3>
+                                        <span class="play-pill">{{ character.role }}</span>
+                                    </div>
+                                    <p>{{ character.summary }}</p>
+                                    {% if character.personality %}
+                                    <p class="muted">Характер: {{ character.personality }}</p>
+                                    {% endif %}
+                                    {% if character.location %}
+                                    <p class="muted">Где: {{ character.location }}</p>
+                                    {% endif %}
+                                </article>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if ns.count == 0 %}
+                                <article class="play-glass-card">
+                                    <p class="muted">Кроме героя, в этой сцене пока никто не зафиксирован.</p>
+                                </article>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="play-info-section" data-scene-panel="quests">
+                            <div class="play-info-scroll">
+                                {% set q = namespace(count=0) %}
+                                {% for quest in selected.quests %}
+                                {% if quest.status == "active" %}
+                                {% set q.count = q.count + 1 %}
+                                <article class="play-glass-card">
+                                    <div class="play-card-head">
+                                        <h3>{{ quest.title }}</h3>
+                                        {% if quest.turns_remaining is not none %}
+                                        <span class="play-pill">{{ quest.turns_remaining }}/{{ quest.turns_total }}</span>
+                                        {% else %}
+                                        <span class="play-pill">{{ quest.status }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <p>{{ quest.description }}</p>
+                                    {% if quest.progress_note %}
+                                    <p class="muted">{{ quest.progress_note }}</p>
+                                    {% endif %}
+                                </article>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if q.count == 0 %}
+                                <article class="play-glass-card">
+                                    <p class="muted">Активных квестов сейчас нет.</p>
+                                </article>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="play-info-section" data-scene-panel="inventory">
+                            <div class="play-info-scroll">
+                                <article class="play-glass-card">
+                                    <div class="play-card-head">
+                                        <h3>{{ selected.hero.name }}</h3>
+                                        <span class="play-pill">{{ selected.hero.archetype }}</span>
+                                    </div>
+                                    <div class="play-stat-grid">
+                                        <div class="play-stat-chip"><span>Сила</span><strong>{{ selected.hero.stats.get("brute_force", 0) }}</strong></div>
+                                        <div class="play-stat-chip"><span>Бюрократия</span><strong>{{ selected.hero.stats.get("bureaucracy", 0) }}</strong></div>
+                                        <div class="play-stat-chip"><span>Софт</span><strong>{{ selected.hero.stats.get("soft_skills", 0) }}</strong></div>
+                                        <div class="play-stat-chip"><span>Уклонение</span><strong>{{ selected.hero.stats.get("evasion", 0) }}</strong></div>
+                                        <div class="play-stat-chip"><span>HP</span><strong>{{ selected.hero.stats.get("hp", 20) }}/{{ selected.hero.stats.get("max_hp", 20) }}</strong></div>
+                                        <div class="play-stat-chip"><span>Стресс</span><strong>{{ selected.hero.stats.get("stress", 0) }}/{{ selected.hero.stats.get("max_stress", 7) }}</strong></div>
+                                        <div class="play-stat-chip"><span>Металл</span><strong>{{ selected.hero.stats.get("scrap", 0) }}</strong></div>
+                                    </div>
+                                </article>
+
+                                <article class="play-glass-card">
+                                    <h3>Инвентарь</h3>
+                                    {% if selected.hero.inventory %}
+                                    <ul class="play-inventory-list">
+                                        {% for item in selected.hero.inventory %}
+                                        <li>{{ item.name }} x{{ item.quantity }}{% if item.description %} — {{ item.description }}{% endif %}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <p class="muted">Пока пусто.</p>
+                                    {% endif %}
+                                </article>
+                            </div>
+                        </section>
+                    </div>
+                </aside>
+
+                <form id="turn-form" class="play-input-bar" data-campaign-id="{{ selected.id }}" data-scene-play-form="true">
+                    <button class="play-round-button play-d20-button" type="button" data-roll-d20 aria-label="Бросить d20">
+                        <span class="play-d20-spinner" aria-hidden="true">
+                            <img class="play-d20-art" src="{{ url_for('static', path='scene/d20-purple.png') }}" alt="">
+                        </span>
+                        <span class="play-d20-label">d20</span>
+                        <span class="play-d20-value" data-roll-output></span>
+                    </button>
+
+                    <div class="play-input-main">
+                        <textarea id="scene-message" name="message" rows="2" placeholder="Что вы делаете?" required></textarea>
+                        <div class="play-input-meta">
+                            <span id="turn-status" class="status-line muted"></span>
+                        </div>
+                        <button class="play-send-button play-send-button-inline" type="submit" aria-label="Отправить ход">
+                            <span class="play-send-glyph" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M3.4 11.04 19.78 4.5a1 1 0 0 1 1.31 1.24l-4.84 13.9a1 1 0 0 1-1.83.15l-2.75-5.28-5.28-2.75a1 1 0 0 1 .01-1.84Zm4.98.45 4.46 2.33 2.33 4.46 3.64-10.47Z"/></svg>
+                            </span>
+                        </button>
+                    </div>
+
+                    <button class="play-round-button play-emotion-button" type="button" data-emotion-picker-toggle aria-label="Выбрать эмоцию Gemma">
+                        <span class="play-round-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M12 22a10 10 0 1 1 10-10 10 10 0 0 1-10 10Zm-4-8a1 1 0 0 0-.8 1.6A6.12 6.12 0 0 0 12 18a6.12 6.12 0 0 0 4.8-2.4A1 1 0 1 0 15.2 14a4.06 4.06 0 0 1-6.4 0A1 1 0 0 0 8 14Zm1-4.5A1.25 1.25 0 1 0 10.25 10.75 1.25 1.25 0 0 0 9 9.5Zm6 0A1.25 1.25 0 1 0 16.25 10.75 1.25 1.25 0 0 0 15 9.5Z"/></svg>
+                        </span>
+                    </button>
+
+                    <button class="play-round-button play-mic-button" type="button" aria-label="Микрофон">
+                        <span class="play-mic-glyph" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M12 15a3 3 0 0 0 3-3V8a3 3 0 1 0-6 0v4a3 3 0 0 0 3 3Zm5-3a1 1 0 0 0-2 0 3 3 0 0 1-6 0 1 1 0 0 0-2 0 5 5 0 0 0 4 4.9V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-3.1A5 5 0 0 0 17 12Z"/></svg>
+                        </span>
+                    </button>
+
+                    <div class="play-emotion-popover" data-emotion-picker hidden>
+                        <button type="button" class="play-emotion-choice is-active" data-emotion-choice="auto">Авто</button>
+                        <button type="button" class="play-emotion-choice" data-emotion-choice="neutral">Нейтр.</button>
+                        <button type="button" class="play-emotion-choice" data-emotion-choice="joy">Радость</button>
+                        <button type="button" class="play-emotion-choice" data-emotion-choice="surprised">Удивл.</button>
+                        <button type="button" class="play-emotion-choice" data-emotion-choice="angry">Злость</button>
+                        <button type="button" class="play-emotion-choice" data-emotion-choice="fear">Страх</button>
+                        <button type="button" class="play-emotion-choice" data-emotion-choice="shock">Шок</button>
+                        <button type="button" class="play-emotion-choice" data-emotion-choice="glasses">Очки</button>
+                    </div>
+
+                    <input type="hidden" name="dice_result" value="">
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="play-empty-state">
+        <a href="/" class="play-back-button" data-view-link aria-label="Вернуться к панели управления">
+            <span class="view-switch-arrow left"></span>
+        </a>
+        <div class="card">
+            <p class="eyebrow">Play mode</p>
+            <h1>Сначала выбери кампанию</h1>
+            <p class="muted">Когда в приложении появится активная кампания, здесь откроется игровая сцена.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
