@@ -155,8 +155,8 @@ const syncApiKeyForms = (root = document) => {
   });
   root.querySelectorAll("[data-api-key-status]").forEach((status) => {
     status.textContent = textKey || voiceKey
-      ? "Ключи сохранены только в этом браузере. В проект и GitHub они не записываются."
-      : "Для публичного демо вставь ключи здесь. Локальный .env продолжит работать на твоём ПК.";
+      ? "Ключи сохранены в этом браузере."
+      : "";
   });
 };
 

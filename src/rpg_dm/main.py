@@ -60,6 +60,9 @@ def index(
     available_models = llm_client.list_models()
     campaign_service = CampaignService(db, settings, available_models)
     campaigns = campaign_service.list_campaigns()
+    if not campaigns:
+        campaign_service.get_or_seed_default_campaign()
+        campaigns = campaign_service.list_campaigns()
     selected = load_campaign(db, campaign_id) if campaign_id is not None else None
     if selected is None and campaigns:
         selected = campaigns[0]

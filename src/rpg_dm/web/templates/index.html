@@ -9,6 +9,7 @@
         aria-label="Переключиться на игровую сцену"
     >
         <span class="view-switch-arrow"></span>
+        <span>Игровой стол</span>
     </a>
     {% endif %}
     <aside class="sidebar">
@@ -21,7 +22,7 @@
         <details class="card fold-card api-key-card">
             <summary class="fold-summary">
                 <div>
-                    <p class="eyebrow">Demo keys</p>
+                    <p class="eyebrow">API</p>
                     <h2>API-ключи</h2>
                 </div>
                 <span class="fold-summary-icon"></span>
@@ -91,6 +92,10 @@
                         </div>
                         <div class="campaign-extra {% if selected and selected.id == campaign.id %}is-open{% endif %}">
                             <p class="muted campaign-goal">{{ campaign.goal }}</p>
+                            <a href="/?campaign_id={{ campaign.id }}&view=play" class="campaign-play-link" data-view-link>
+                                <span>Открыть игровой стол</span>
+                                <span class="view-switch-arrow"></span>
+                            </a>
                         </div>
                     </article>
                     {% endfor %}
