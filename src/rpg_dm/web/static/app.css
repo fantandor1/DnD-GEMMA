@@ -2668,6 +2668,7 @@ button[disabled] {
     right: 244px;
     width: 214px;
     height: 70px;
+    z-index: 18;
     pointer-events: none;
 }
 
@@ -2685,6 +2686,8 @@ button[disabled] {
     background: transparent;
     backdrop-filter: none;
     box-shadow: none;
+    color: transparent;
+    font-size: 0;
     pointer-events: auto;
 }
 
@@ -2942,7 +2945,7 @@ button[disabled] {
     width: 214px;
     height: 70px;
     gap: 12px;
-    padding: 0 16px;
+    padding: 0 54px 0 16px;
     border-radius: 22px;
 }
 
