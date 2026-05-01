@@ -118,15 +118,21 @@
                         <span class="play-voice-status" data-voice-status>Авточтение выключено</span>
                     </span>
                 </button>
-                <select class="play-voice-provider" data-voice-provider aria-label="TTS provider">
-                    <option value="google">Google 3.1 Leda</option>
-                    <option value="google25">Google 2.5 Leda</option>
-                    <option value="silero">Silero local</option>
-                    <option value="edge">Edge</option>
-                </select>
-                <details class="play-api-key-panel">
-                    <summary>API</summary>
+                <details class="play-settings-panel">
+                    <summary>
+                        <span>Модель / API</span>
+                        <span class="fold-summary-icon"></span>
+                    </summary>
                     <form class="api-key-form" data-api-key-form>
+                        <label>
+                            <span>Голосовая модель</span>
+                            <select class="play-voice-provider" data-voice-provider aria-label="TTS provider">
+                                <option value="google">Google 3.1 Leda</option>
+                                <option value="google25">Google 2.5 Leda</option>
+                                <option value="silero">Silero local</option>
+                                <option value="edge">Edge</option>
+                            </select>
+                        </label>
                         <label>
                             <span>Текст</span>
                             <input name="text_api_key" type="password" autocomplete="off" data-text-api-key-input placeholder="Gemma 4 / Gemini 3.1 Pro">

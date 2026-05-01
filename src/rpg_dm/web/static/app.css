@@ -2530,10 +2530,7 @@ button[disabled] {
 }
 
 .play-voice-provider {
-    position: absolute;
-    top: 142px;
-    right: 222px;
-    width: 244px;
+    width: 100%;
     height: 34px;
     padding: 0 34px 0 12px;
     border: 1px solid rgba(190, 130, 255, 0.28);
@@ -2550,7 +2547,49 @@ button[disabled] {
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.play-voice-provider:focus-visible {
+.play-settings-panel {
+    position: absolute;
+    top: 104px;
+    right: 478px;
+    width: 250px;
+    z-index: 15;
+    color: rgba(245, 240, 255, 0.92);
+}
+
+.play-settings-panel summary {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 12px;
+    list-style: none;
+    border: 1px solid rgba(190, 130, 255, 0.28);
+    border-radius: 12px;
+    background:
+        linear-gradient(135deg, rgba(190, 130, 255, 0.14), rgba(23, 18, 43, 0.9)),
+        rgba(12, 14, 28, 0.76);
+    backdrop-filter: blur(16px);
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.play-settings-panel summary::-webkit-details-marker {
+    display: none;
+}
+
+.play-settings-panel[open] summary .fold-summary-icon {
+    transform: rotate(225deg);
+}
+
+.play-voice-provider:focus-visible,
+.play-settings-panel summary:focus-visible {
     border-color: rgba(215, 176, 255, 0.72);
     box-shadow:
         0 0 24px rgba(155, 92, 255, 0.28),
@@ -2562,35 +2601,7 @@ button[disabled] {
     color: #f5f0ff;
 }
 
-.play-api-key-panel {
-    position: absolute;
-    top: 140px;
-    right: 244px;
-    width: 214px;
-    z-index: 8;
-    color: rgba(245, 240, 255, 0.92);
-}
-
-.play-api-key-panel summary {
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    list-style: none;
-    border: 1px solid rgba(190, 130, 255, 0.28);
-    border-radius: 12px;
-    background: linear-gradient(135deg, rgba(23, 18, 43, 0.9), rgba(12, 14, 28, 0.76));
-    cursor: pointer;
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 0.12em;
-}
-
-.play-api-key-panel summary::-webkit-details-marker {
-    display: none;
-}
-
-.play-api-key-panel .api-key-form {
+.play-settings-panel .api-key-form {
     margin-top: 8px;
     padding: 10px;
     display: grid;
@@ -2602,7 +2613,7 @@ button[disabled] {
     box-shadow: 0 16px 38px rgba(0, 0, 0, 0.34);
 }
 
-.play-api-key-panel label {
+.play-settings-panel label {
     display: grid;
     gap: 4px;
     font-size: 10px;
@@ -2611,20 +2622,20 @@ button[disabled] {
     color: rgba(215, 208, 236, 0.78);
 }
 
-.play-api-key-panel input {
+.play-settings-panel input {
     min-height: 30px;
     padding: 6px 8px;
     border-radius: 10px;
     font-size: 11px;
 }
 
-.play-api-key-panel .api-key-actions {
+.play-settings-panel .api-key-actions {
     display: grid;
     grid-template-columns: 1fr 36px;
     gap: 6px;
 }
 
-.play-api-key-panel button {
+.play-settings-panel button {
     min-height: 30px;
     border-radius: 10px;
     border: 1px solid rgba(190, 130, 255, 0.24);
@@ -2633,7 +2644,7 @@ button[disabled] {
     cursor: pointer;
 }
 
-.play-api-key-panel p {
+.play-settings-panel p {
     margin: 0;
     color: rgba(151, 158, 192, 0.9);
     font-size: 10px;
@@ -2755,9 +2766,9 @@ button[disabled] {
 }
 
 .play-info-panel {
-    left: 1450px;
+    left: 1484px;
     top: 112px;
-    width: 420px;
+    width: 400px;
     height: 790px;
 }
 
@@ -2887,12 +2898,15 @@ button[disabled] {
     height: 52px;
 }
 
-.play-voice-provider {
-    top: 102px;
-    right: 244px;
-    width: 214px;
+.play-settings-panel {
+    top: 104px;
+    right: 478px;
+    width: 250px;
+}
+
+.play-settings-panel .play-voice-provider {
     height: 30px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 10px;
 }
 
