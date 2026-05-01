@@ -1075,13 +1075,6 @@ button[disabled] {
     color: var(--text);
 }
 
-.dashboard-view-switch {
-    top: 1.2rem;
-    right: 3.15rem;
-    width: 2.65rem;
-    height: 2.65rem;
-}
-
 .campaign-play-link {
     display: inline-flex;
     align-items: center;
@@ -1102,6 +1095,16 @@ button[disabled] {
 .campaign-play-link .view-switch-arrow {
     width: 0.65rem;
     height: 0.65rem;
+}
+
+.play-icon-button {
+    color: var(--text);
+    text-decoration: none;
+}
+
+.play-icon-button .view-switch-arrow {
+    width: 0.55rem;
+    height: 0.55rem;
 }
 
 .scene-view-switch {

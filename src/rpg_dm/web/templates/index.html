@@ -1,16 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="shell" data-shell-root data-view-mode="dashboard">
-    {% if selected %}
-    <a
-        href="/?campaign_id={{ selected.id }}&view=play"
-        class="view-switch-button dashboard-view-switch"
-        data-view-link
-        aria-label="Переключиться на игровую сцену"
-    >
-        <span class="view-switch-arrow"></span>
-    </a>
-    {% endif %}
     <aside class="sidebar">
         <section class="card brand-card compact-brand">
             <p class="eyebrow">LM Studio + Google API</p>
@@ -66,6 +56,14 @@
                                 <span class="muted">{{ campaign.model_id }}</span>
                             </a>
                             <div class="campaign-actions">
+                                <a
+                                    class="icon-button play-icon-button"
+                                    href="/?campaign_id={{ campaign.id }}&view=play"
+                                    data-view-link
+                                    aria-label="Открыть игровой стол"
+                                >
+                                    <span class="view-switch-arrow"></span>
+                                </a>
                                 <button
                                     class="icon-button"
                                     type="button"
