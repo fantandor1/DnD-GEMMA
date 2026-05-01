@@ -1076,17 +1076,10 @@ button[disabled] {
 }
 
 .dashboard-view-switch {
-    top: 1.25rem;
-    right: 1.25rem;
-}
-
-.dashboard-view-switch {
-    gap: 0.55rem;
-    width: auto;
-    min-width: 10.5rem;
-    padding: 0 1rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
+    top: 1.2rem;
+    right: 3.15rem;
+    width: 2.65rem;
+    height: 2.65rem;
 }
 
 .campaign-play-link {
